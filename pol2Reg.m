@@ -1,7 +1,13 @@
 function [xmin, ymin, hess, it] = pol2Reg()
 
-    xpoints = [1, 2, 3, 4, 5, 3, 7, 8, 9, 7];
-    ypoints = [1, 4, 3, 2, 5, 6, 2, 8, 9, 10];
+    xpoints = linspace(-20, 20);
+    randos = rand([1,length(xpoints)]) - .5;
+    function res = points(X)
+        
+       res = 3 + xpoints.*2 + xpoints.^2 + 60.*randos;
+    end
+
+    ypoints = points(xpoints);
 
     function y = curve(a, b, c, x)
        y = a + b.*x + c.*(x.^2); 
@@ -59,13 +65,14 @@ function [xmin, ymin, hess, it] = pol2Reg()
         fab = Hes3(a,b);
         hess = fbb*faa - fab^2;
     end
-    [A,B] = meshgrid(-10:.1:10, -10:.1:10);
-    Z = func(A,B);
-    FA = aGrad(A,B);
-    FB = bGrad(A,B);
+    [A,B,C] = meshgrid(-10:.1:10);
+    Z = func(A,B,C);
+    FA = aGrad(A,B,C);
+    FB = bGrad(A,B,C);
+    FC = cGrad(A,B,C);
     
     subplot(1,2,1)
-    contour3(A, B, Z, 30)
+    contour3(A(:,:,1), B(:,:,1), Z(:,:,1), 30)
     xlabel('A')
     ylabel('B')
     zlabel('Z')
@@ -73,42 +80,55 @@ function [xmin, ymin, hess, it] = pol2Reg()
     n = 5;
     ai = 1.2;
     bi = 0;
-    zi = func(ai, bi);
+    ci = 0;
+    zi = func(ai, bi, ci);
     fa = 1;
+    fb = 1;
     fc = 1;
     scatter3(ai, bi, zi, 'gs')
     lambdas = logspace(-8, 1, 50);
     it = 0;
     
 %     for i = 1:n
-    while abs([fa, fc]) > .00001
+    while abs([fa, fb, fc]) > .000001
         it  = it + 1;
-        fa = aGrad(ai, bi);
-        fc = bGrad(ai, bi);
-        Xp = ai - lambdas*fa;
-        Yp = bi - lambdas*fc;
-        Zp = func(Xp, Yp);
+        fa = aGrad(ai,bi, ci);
+        fb = bGrad(ai,bi,ci);
+        fc = cGrad(ai,bi,ci);
+        Ap = ai - lambdas*fa;
+        Bp = bi - lambdas*fb;
+        Cp = ci - lambdas*fc;
+        Zp = func(Ap, Bp, Cp);
         [~, ind] = min(Zp(1:46));
         lambda = lambdas(ind);
         af = ai - lambda*fa;
-        bf = bi - lambda*fc;
-        zf = func(af, bf);
+        bf = bi - lambda*fb;
+        cf = ci - lambda*fc;
+        zf = func(af, bf, cf);
         subplot(1,2,1)
         scatter3(af, bf, zf)
         plot3([ai,af], [bi,bf], [zi,zf])
         ai = af;
         bi = bf;
+        ci = cf;
         zi = zf;
     end
-    hess = Hess(ai, bi);
-    xmin = ai;
-    ymin = bi;
+%     hess = Hess(ai, bi);
+    amin = ai
+    bmin = bi
+    cmin = ci
     subplot(1,2,2)
     scatter(xpoints, ypoints)
     xlabel('x')
     ylabel('y')
     hold all
-    plot([0, 10], [line(xmin, ymin, 0), line(xmin, ymin, 10)])
+    
+    function res = plotter(a, b, c, x)
+        res = a + b.*x + c.*(x.^2);
+    end
+    x = linspace(-20, 20);
+    y = plotter(amin, bmin, cmin, x);
+    plot(x, y)
     
     
     
