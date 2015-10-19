@@ -1,13 +1,15 @@
 function [xmin, ymin, hess, it] = pol2Reg()
 
     xpoints = linspace(-20, 20);
+%     xpoints = [39,78,117,156,195,234,273,312,351,390,429,468,507,546,585,624,702];
     randos = rand([1,length(xpoints)]) - .5;
+    
     function res = points(X)
-        
        res = 3 + xpoints.*2 + xpoints.^2 + 60.*randos;
     end
 
     ypoints = points(xpoints);
+%     ypoints = [42,99,124,207,304,372,440,632,842,1023,1205,1398,1783,2177,2565,3851,5962];
 
     function y = curve(a, b, c, x)
        y = a + b.*x + c.*(x.^2); 

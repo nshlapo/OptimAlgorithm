@@ -1,7 +1,6 @@
 from __future__ import division
 import numpy as np
-import sympy as sp
-import string
+
 
 points = [(1, 1), (1, 0), (2, 2), (12, 5432)]
 
@@ -9,7 +8,7 @@ coeffVals = [1, 1, 1, 1]
 
 def calcError(points, coeffVals):
 	'''
-	Calculates error by taking sum of error between each 
+	Calculates error by taking sum of error between each
 	point and the polynomial function
 
 	Inputs:
@@ -29,15 +28,15 @@ def calcError(points, coeffVals):
 
 def calcDeriv(points, coeffVals, indexCoeff):
 	'''
-	Calculates derivative of function with respect to given 
+	Calculates derivative of function with respect to given
 	coefficient index at each given error function location
 
-	Inputs: 
+	Inputs:
 		points (list of tuples): Points to fit
 		coeffVals (list): Coefficients of polynomial function
-		indexCoeff (int): Term of function for which derivative 
+		indexCoeff (int): Term of function for which derivative
 		is taken respect to
-	Returns: 
+	Returns:
 		finalDeriv (int): Value of derivative of function with
 		respect to the given index
 	'''
@@ -51,13 +50,13 @@ def calcDeriv(points, coeffVals, indexCoeff):
 	return finalDeriv
 
 # In final function, iterate over degrees until satisfactory fit is reached
-degree = 5
+degree = 2
 
-domain = np.meshgrid(*[np.linspace(-100, 100, 50) for i in range(degree)])
-print domain
-
-# We're running into a memory error! 
-# Solutions: make it sparse (helps with memory), use smaller types (8bit ints)
+coeffVals = np.meshgrid(*[np.linspace(-100, 100, 2000) for i in range(degree)], sparse=True)
+gradVals = []
+# iterate over every matrix location in coeffVals[0]
+for i in everycoeffVals):
+	gradVals.append(calcDeriv(points, coeffVals, indexCoeff))
 
 
 # print calcDeriv(points, [1, 1], 0)
