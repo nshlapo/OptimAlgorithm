@@ -73,7 +73,7 @@ function [xmin, ymin, hess, it] = linReg()
     
 %     for i = 1:n
     while abs([fa, fb]) > .00001
-        it  = it + 1;
+        it  = it + c1;
         fa = aGrad(ai, bi);
         fb = bGrad(ai, bi);
         Xp = ai - lambdas*fa;

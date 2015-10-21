@@ -5,7 +5,8 @@ import itertools
 
 points = [(1, 1), (1, 0), (2, 2), (12, 5432)]
 
-coeffVals = [1, 1, 1, 1]
+coeffVals = np.meshgrid(*[np.linspace(-100, 100, 2000) for i in range(degree)], sparse=True)
+# coeffVals = [1, 1, 1, 1]
 
 def calcError(points, coeffVals):
 	'''
@@ -99,14 +100,48 @@ def calcDeriv(points, coeffVals, indexCoeff):
 	return finalDeriv
 
 # In final function, iterate over degrees until satisfactory fit is reached
-degree = 2
+degree = 22
 
-coeffVals = np.meshgrid(*[np.linspace(-100, 100, 2000) for i in range(degree)], sparse=True)
-gradVals = []
-# iterate over every matrix location in coeffVals[0]
-for i in everycoeffVals):
-	gradVals.append(calcDeriv(points, coeffVals, indexCoeff))
+def gradientDescent(coeffs, degree):
+    ''' Performs a gradient descent using coeffs as the domain and returns the
+        location of the minimum (in coefficient space), and the number of
+        iterations to reach the minumum.
 
+        coeffs: a list of meshgrided matrices representing
+        degree: the length of the coefficient arrays in coeffs
+    '''
 
-# print calcDeriv(points, [1, 1], 0)
-# print calcError(points, [1, 1])
+    # initialize variables and arrays we'll need for gr dsc
+    grad = calcDeriv(points, coeffVals, indexCoeff)
+    iCoeffs = numpy.zeros(degree)
+    iz = func(coeffs)
+    lambdas = np.logspace(-8, 1, 50)
+    it = 0
+    grad = numpy.ones(degree)
+
+    # perform the gr dsc
+    while (np.linalg.norm(grad) > .00001):
+        it  = it + 1
+        grad = gradient(coeffs)
+        optiLambda = optimalLambda(iCoeffs, grad, lamdbas)
+        fCoeffs = iCoeffs - optiLambda*grad;
+        fz = func(fCoeffs);
+        iCoeffs = fCoeffs;
+        iz = fz;
+
+    return it, fCoeffs
+
+def optimalLambda(iCoeffs, grad, lambdas):
+    ''' Returns the optimal lambda for a given gradient descent step.
+
+        iCoeffs: starting location (coefficients) for current step
+        grad: the gradient vector for the current location
+        lambdas: list of potential lambda values
+    '''
+
+    pCoeffs = iCoeffs - lambdas*grad
+    pZ = func(pCoeffs)
+    ind = Zp.argmax(axis=0)
+    optiLambda = lambdas[ind];
+
+    return optiLamdba
