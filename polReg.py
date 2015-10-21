@@ -133,16 +133,17 @@ def calc_all_gradient(points, coeffMatrices):
 
 	return gradientMatrix
 
-def calc_all_gradient(points, coeffMatrices):
-
 def pol_reg(points):
     points = [(1, 1), (1, 0), (2, 2), (12, 5432)]
-    degree = 1
-    while some condition:
-        coeffVals = np.meshgrid(*[np.linspace(-100, 100, 2000) for i in range(degree)], sparse=True)
+    degree = 3
+    while degree<4:
+        coeffMatrix = np.meshgrid(*[np.linspace(-100, 100, 2000) for i in range(degree)], sparse=True)
+        optimCoeffs = gradientDescent(points, coeffMatrices, degree)
         degree += 1
 
-def gradientDescent(points, coeffVals, coeffMatrices, degree):
+    return optimCoeffs
+
+def gradientDescent(points, degree):
     ''' Performs a gradient descent using coeffs as the domain and returns the
         location of the minimum (in coefficient space), and the number of
         iterations to reach the minumum.
@@ -152,21 +153,21 @@ def gradientDescent(points, coeffVals, coeffMatrices, degree):
     '''
 
     # initialize variables and arrays we'll need for gr dsc
-    iCoeffs = numpy.zeros(degree)
-    iz = calc_error(points, coeffVals)
+    iCoeffs = np.zeros(degree)
+    iError = calc_error(points, iCoeffs)
     lambdas = np.logspace(-8, 1, 50)
     it = 0
-    grad = numpy.ones(degree)
+    grad = np.ones(degree)
 
     # perform the gr dsc
     while (np.linalg.norm(grad) > .00001):
         it  = it + 1
-        grad = calc_all_gradient(points, coeffMatrices)
-        optiLambda = optimalLambda(iCoeffs, grad, lamdbas)
+        grad = calc_gradient(points, iCoeffs)
+        optiLambda = optimalLambda(iCoeffs, grad, lambdas)
         fCoeffs = iCoeffs - optiLambda*grad;
-        fz = calc_all_error(points, coeffMatrices);
+        fError = calc_error(points, fCoeffs);
         iCoeffs = fCoeffs;
-        iz = fz;
+        iError = fError;
 
     return it, fCoeffs
 
@@ -179,8 +180,10 @@ def optimalLambda(iCoeffs, grad, lambdas):
     '''
 
     pCoeffs = iCoeffs - lambdas*grad
-    pZ = calc_error(points, pCoeffs)
-    ind = pZ.argmax(axis=0)
+    pError = calc_error(points, pCoeffs)
+    ind = pError.argmax(axis=0)
     optiLambda = lambdas[ind];
 
     return optiLamdba
+
+print pol_reg([1])
