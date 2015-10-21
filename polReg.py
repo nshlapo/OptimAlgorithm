@@ -29,16 +29,10 @@ def calc_all_error(points, coeffMatrices):
     Calculates total error over entire domain for each set
     of coefficient values
 
-<<<<<<< HEAD
-    Inputs:
-        coeffMatrices (list of np matrices): List of matrices
-        representing all possible combinations of coeff vals
-=======
 	Inputs:
 		points (list of tuples): 'data set' of points to fit
 		coeffMatrices (list of np matrices): List of matrices
 		representing all possible combinations of coeff vals
->>>>>>> 627ade37e7a5d3aa1ad2e84b3662ddb93f811d3f
 
     Returns:
         errorMatrix (np matrix): Error at each given pointl
@@ -132,8 +126,6 @@ def calc_all_gradient(points, coeffMatrices):
 		gradientMatrix[location] = gradientAtLoc
 
 	return gradientMatrix
-
-def calc_all_gradient(points, coeffMatrices):
 
 def pol_reg(points):
     points = [(1, 1), (1, 0), (2, 2), (12, 5432)]
