@@ -4,7 +4,7 @@ import itertools
 
 
 
-def calc_point_error(points, coeffVals):
+def calc_error(points, coeffVals):
     '''
     Calculates error by taking sum of error between each
     point and the polynomial function
@@ -96,7 +96,7 @@ def calc_gradient(points, coeffVals, indexCoeff):
 	finalDeriv = -2*deriv
 	return finalDeriv
 
-def calc_all_gradient(points, coeffMatrices):
+def calc_all_gradient(points, coeffVals):
 	'''
 	Calculates gradient for every point in domain, where each
 	point includes a set of coefficient values describing the
@@ -110,29 +110,29 @@ def calc_all_gradient(points, coeffMatrices):
 	Returns:
 		errorMatrix (np matrix): Error at each given point
 	'''
-	gradientMatrix = np.zeros([coeffMatrices[0].shape[i] for i in range(len(coeffMatrices.shape[0]))])
+	# gradientMatrix = np.zeros([coeffMatrices[0].shape[i] for i in range(len(coeffMatrices.shape[0]))])
 
-	ranges = [range(coeffMatrix.shape[i]) for i in range(len(coeffMatrix.shape)) for coeffMatrix in coeffMatrices]
+	# ranges = [range(coeffMatrix.shape[i]) for i in range(len(coeffMatrix.shape)) for coeffMatrix in coeffMatrices]
 
-	domain = itertools.product(*ranges)
+	# domain = itertools.product(*ranges)
 
-	for location in domain:
-		coeffVals = [coeffMatrix[location] for coeffMatrix in coeffMatrices]
-		gradientAtLoc = []
+	# for location in domain:
+	# 	coeffVals = [coeffMatrix[location] for coeffMatrix in coeffMatrices]
+	gradientAtLoc = []
 
-		for i in range(len(coeffVals)):
-			gradientAtLoc[i] = calc_gradient(points, coeffVals, i)
+	for i in range(len(coeffVals)):
+		gradientAtLoc.append(calc_gradient(points, coeffVals, i))
 
-		gradientMatrix[location] = gradientAtLoc
+	# gradientMatrix[location] = gradientAtLoc
 
-	return gradientMatrix
+	return gradientAtLoc
 
 def pol_reg(points):
     points = [(1, 1), (1, 0), (2, 2), (12, 5432)]
     degree = 3
     while degree<4:
-        coeffMatrix = np.meshgrid(*[np.linspace(-100, 100, 2000) for i in range(degree)], sparse=True)
-        optimCoeffs = gradientDescent(points, coeffMatrices, degree)
+        # coeffMatrix = np.meshgrid(*[np.linspace(-100, 100, 2000) for i in range(degree)], sparse=True)
+        optimCoeffs = gradientDescent(points, degree)
         degree += 1
 
     return optimCoeffs
@@ -156,16 +156,16 @@ def gradientDescent(points, degree):
     # perform the gr dsc
     while (np.linalg.norm(grad) > .00001):
         it  = it + 1
-        grad = calc_gradient(points, iCoeffs)
-        optiLambda = optimalLambda(iCoeffs, grad, lambdas)
-        fCoeffs = iCoeffs - optiLambda*grad;
+        grad = calc_all_gradient(points, iCoeffs)
+        optiLambda = optimalLambda(points, iCoeffs, grad, lambdas)
+        fCoeffs = iCoeffs - np.multiply(optiLambda,grad);
         fError = calc_error(points, fCoeffs);
         iCoeffs = fCoeffs;
         iError = fError;
 
     return it, fCoeffs
 
-def optimalLambda(iCoeffs, grad, lambdas):
+def optimalLambda(points, iCoeffs, grad, lambdas):
     ''' Returns the optimal lambda for a given gradient descent step.
 
         iCoeffs: starting location (coefficients) for current step
@@ -173,11 +173,6 @@ def optimalLambda(iCoeffs, grad, lambdas):
         lambdas: list of potential lambda values
     '''
 
-    pCoeffs = iCoeffs - lambdas*grad
-    pError = calc_error(points, pCoeffs)
-    ind = pError.argmax(axis=0)
-    optiLambda = lambdas[ind];
-
-    return optiLamdba
+    return lambdas[calc_error(points, [iCoeffs - np.multiply(lambdo,grad) for lambdo in lambdas]).argmin(axis=0)]
 
 print pol_reg([1])
