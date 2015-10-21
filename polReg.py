@@ -34,6 +34,7 @@ def calc_all_error(points, coeffMatrices):
 	of coefficient values
 
 	Inputs:
+		points (list of tuples): 'data set' of points to fit
 		coeffMatrices (list of np matrices): List of matrices
 		representing all possible combinations of coeff vals
 
@@ -82,7 +83,7 @@ def calc_gradient(points, coeffVals, indexCoeff):
 	coefficient index at each given error function location
 
 	Inputs:
-		points (list of tuples): Points to fit
+		points (list of tuples): 'data set' of points to fit
 		coeffVals (list): Coefficients of polynomial function
 		indexCoeff (int): Term of function for which derivative
 		is taken respect to
@@ -100,6 +101,35 @@ def calc_gradient(points, coeffVals, indexCoeff):
 	return finalDeriv
 
 def calc_all_gradient(points, coeffMatrices):
+	'''
+	Calculates gradient for every point in domain, where each 
+	point includes a set of coefficient values describing the 
+	function
+
+	Inputs:
+		points (list of tuples): 'data set' of points to fit
+		coeffMatrices (list of np matrices): List of matrices
+		representing all possible combinations of coeff vals
+
+	Returns:
+		errorMatrix (np matrix): Error at each given point
+	'''
+	gradientMatrix = np.zeros([coeffMatrices[0].shape[i] for i in range(len(coeffMatrices.shape[0]))])
+
+	ranges = [range(coeffMatrix.shape[i]) for i in range(len(coeffMatrix.shape)) for coeffMatrix in coeffMatrices]
+
+	domain = itertools.product(*ranges)
+
+	for location in domain:
+		coeffVals = [coeffMatrix[location] for coeffMatrix in coeffMatrices]
+		gradientAtLoc = []
+
+		for i in range(len(coeffVals)):
+			gradientAtLoc[i] = calc_gradient(points, coeffVals, i)
+
+		gradientMatrix[location] = gradientAtLoc
+
+	return gradientMatrix
 
 
 # In final function, iterate over degrees until satisfactory fit is reached
