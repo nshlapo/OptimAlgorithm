@@ -129,8 +129,8 @@ def calc_all_gradient(points, coeffVals):
 	return gradientAtLoc
 
 def pol_reg(points):
-    degree = 3
-    while degree<4:
+    degree = 2
+    while degree<3:
         # coeffMatrix = np.meshgrid(*[np.linspace(-100, 100, 2000) for i in range(degree)], sparse=True)
         optimCoeffs = gradientDescent(points, degree)
         degree += 1
@@ -178,21 +178,22 @@ def optimalLambda(points, iCoeffs, grad, lambdas):
 
 def eval_func(points, optimVals):
 
-	min_x = min(points, key=lambda point:point[0])[0]
-	max_x = max(points, key=lambda point:point[0])[0]
+    # min_x = min(points, key=lambda point:point[0])[0]
+    # max_x = max(points, key=lambda point:point[0])[0]
+    min_x = -10
+    max_x = 800
+    domain = np.linspace(min_x, max_x, 100)
 
-	domain = np.linspace(min_x, max_x, 100)
+    func_res = []
 
-	func_res = []
+    for x in domain:
+    	res = 0
+    	for index, coeff in enumerate(optimVals[1]):
+    		res += coeff*(x**index)
 
-	for x in domain:
-		res = 0
-		for index, coeff in enumerate(optimVals[1]):
-			res += coeff*(x**index)
+    	func_res.append(res)
 
-		func_res.append(res)
-
-	return domain, func_res
+    return domain, func_res
 
 def plot_results(points, optimVals):
 	domain, function_res = eval_func(points, optimVals)
@@ -207,10 +208,17 @@ def plot_results(points, optimVals):
 
 
 if __name__ == '__main__':
-	points = [(1, 1), (1, 0), (2, 2), (12, 5432)]
+    points = [(1, 1), (2, 5), (3, 2), (4, 10)]
+    # xp = [39,78,117,156,195,234,273,312,351,390,429,468,507,546,585,624,702]
+    # yp = [42,99,124,207,304,372,440,632,842,1023,1205,1398,1783,2177,2565,3851,5962]
+    # points = zip(xp, yp)
 
-	results = pol_reg(points)
+    results = pol_reg(points)
+    print results
 
-	print results
+    plot_results(points, results)
 
-	plot_results(points, results)
+    #TODO:
+    # Test w/ diff starting points
+    # Plot func surface and gradient vector field
+    # plot gradient descent
