@@ -1,6 +1,7 @@
 from __future__ import division
 import numpy as np
 import itertools
+import matplotlib.pyplot as plt
 
 
 
@@ -128,7 +129,6 @@ def calc_all_gradient(points, coeffVals):
 	return gradientAtLoc
 
 def pol_reg(points):
-    points = [(1, 1), (1, 0), (2, 2), (12, 5432)]
     degree = 3
     while degree<4:
         # coeffMatrix = np.meshgrid(*[np.linspace(-100, 100, 2000) for i in range(degree)], sparse=True)
@@ -175,4 +175,42 @@ def optimalLambda(points, iCoeffs, grad, lambdas):
 
     return lambdas[calc_error(points, [iCoeffs - np.multiply(lambdo,grad) for lambdo in lambdas]).argmin(axis=0)]
 
-print pol_reg([1])
+
+def eval_func(points, optimVals):
+
+	min_x = min(points, key=lambda point:point[0])[0]
+	max_x = max(points, key=lambda point:point[0])[0]
+
+	domain = np.linspace(min_x, max_x, 100)
+
+	func_res = []
+
+	for x in domain:
+		res = 0
+		for index, coeff in enumerate(optimVals[1]):
+			res += coeff*(x**index)
+
+		func_res.append(res)
+
+	return domain, func_res
+
+def plot_results(points, optimVals):
+	domain, function_res = eval_func(points, optimVals)
+
+	xs = [point[0] for point in points]
+	ys = [point[1] for point in points]
+
+	plt.scatter(xs, ys)
+	plt.plot(domain, function_res)
+
+	plt.show()
+
+
+if __name__ == '__main__':
+	points = [(1, 1), (1, 0), (2, 2), (12, 5432)]
+
+	results = pol_reg(points)
+
+	print results
+
+	plot_results(points, results)
