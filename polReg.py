@@ -8,7 +8,7 @@ points = [(1, 1), (1, 0), (2, 2), (12, 5432)]
 coeffVals = np.meshgrid(*[np.linspace(-100, 100, 2000) for i in range(degree)], sparse=True)
 # coeffVals = [1, 1, 1, 1]
 
-def calcError(points, coeffVals):
+def calc_point_error(points, coeffVals):
 	'''
 	Calculates error by taking sum of error between each
 	point and the polynomial function
@@ -28,7 +28,7 @@ def calcError(points, coeffVals):
 
 	return totalError
 
-def calcTotalError(points, coeffMatrices):
+def calc_all_error(points, coeffMatrices):
 	'''
 	Calculates total error over entire domain for each set
 	of coefficient values
@@ -76,7 +76,7 @@ def indexByTuple(matrix, index):
 	return val
 
 
-def calcDeriv(points, coeffVals, indexCoeff):
+def calc_gradient(points, coeffVals, indexCoeff):
 	'''
 	Calculates derivative of function with respect to given
 	coefficient index at each given error function location
@@ -98,6 +98,9 @@ def calcDeriv(points, coeffVals, indexCoeff):
 
 	finalDeriv = -2*deriv
 	return finalDeriv
+
+def calc_all_gradient(points, coeffMatrices):
+
 
 # In final function, iterate over degrees until satisfactory fit is reached
 degree = 22
