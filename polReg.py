@@ -177,7 +177,6 @@ def optimalLambda(points, iCoeffs, grad, lambdas):
 
 
 def eval_func(points, optimVals):
-
     min_x = min(points, key=lambda point:point[0])[0]
     max_x = max(points, key=lambda point:point[0])[0]
 
@@ -191,7 +190,6 @@ def eval_func(points, optimVals):
             res += coeff*(x**index)
 
         func_res.append(res)
-
     return domain, func_res
 
 def plot_results(points, optimVals):
@@ -208,14 +206,17 @@ def plot_results(points, optimVals):
 
 if __name__ == '__main__':
 
-
-    points = [(i, i**2+i**3) for i in range(-30, 30)]
-
-
-    # points = [(1, 1), (1, 0), (2, 2), (12, 5432)]
+    points = [(1, 1), (2, 5), (3, 2), (4, 10)]
+    # xp = [39,78,117,156,195,234,273,312,351,390,429,468,507,546,585,624,702]
+    # yp = [42,99,124,207,304,372,440,632,842,1023,1205,1398,1783,2177,2565,3851,5962]
+    # points = zip(xp, yp)
 
     results = pol_reg(points)
-
     print results
 
     plot_results(points, results)
+
+    #TODO:
+    # Test w/ diff starting points
+    # Plot func surface and gradient vector field
+    # plot gradient descent
