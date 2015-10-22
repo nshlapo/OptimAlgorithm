@@ -2,6 +2,7 @@ from __future__ import division
 import numpy as np
 import itertools
 import matplotlib.pyplot as plt
+import random
 
 
 
@@ -97,6 +98,7 @@ def calc_gradient(points, coeffVals, indexCoeff):
     finalDeriv = -2*deriv
     return finalDeriv
 
+
 def calc_all_gradient(points, coeffVals):
     '''
     Calculates gradient for every point in domain, where each
@@ -128,9 +130,66 @@ def calc_all_gradient(points, coeffVals):
 
     return gradientAtLoc
 
+
+def calc_gradient(points, coeffVals, indexCoeff):
+    '''
+    Calculates derivative of function with respect to given
+    coefficient index at each given error function location
+
+    Inputs:
+        points (list of tuples): 'data set' of points to fit
+        coeffVals (list): Coefficients of polynomial function
+        indexCoeff (int): Term of function for which derivative
+        is taken respect to
+    Returns:
+        finalDeriv (int): Value of derivative of function with
+        respect to the given index
+    '''
+    for point in points:
+        xVal = point[0]
+        yVal = point[1]
+        xDepDeriv = sum([coeff*(xVal**(index+indexCoeff)) for index, coeff in enumerate(coeffVals)])
+        deriv = yVal*(xVal**(indexCoeff)) - xDepDeriv
+
+    finalDeriv = -2*deriv
+    return finalDeriv
+
+def calc_all_gradient_test(points, coeffVals):
+    '''
+    Calculates gradient for every point in domain, where each
+    point includes a set of coefficient values describing the
+    function
+
+    Inputs:
+        points (list of tuples): 'data set' of points to fit
+        coeffMatrices (list of np matrices): List of matrices
+        representing all possible combinations of coeff vals
+
+    Returns:
+        errorMatrix (np matrix): Error at each given point
+    '''
+    a = coeffVals[0]
+    b = coeffVals[1]
+    c = coeffVals[2]
+
+    aGrad = 0
+    bGrad = 0
+    cGrad = 0
+
+    for point in points:
+        aGrad += (point[1] - a - b*point[0] - c*(point[0]**2))
+        bGrad += (point[1] - a - b*point[0] - c*(point[0]**2))*point[0]
+        cGrad += (point[1] - a - b*point[0] - c*(point[0]**2))*(point[0]**2)
+
+    all_gradients = np.multiply(-2,[aGrad, bGrad, cGrad])
+
+    print all_gradients
+
+    return all_gradients
+
 def pol_reg(points):
-    degree = 2
-    while degree<3:
+    degree = 3
+    while degree<4:
         # coeffMatrix = np.meshgrid(*[np.linspace(-100, 100, 2000) for i in range(degree)], sparse=True)
         optimCoeffs = gradientDescent(points, degree)
         degree += 1
@@ -155,8 +214,8 @@ def gradientDescent(points, degree):
 
     # perform the gr dsc
     while (np.linalg.norm(grad) > .001):
-        it  = it + 1
-        grad = calc_all_gradient(points, iCoeffs)
+        it += 1
+        grad = calc_all_gradient_test(points, iCoeffs)
         optiLambda = optimalLambda(points, iCoeffs, grad, lambdas)
         fCoeffs = iCoeffs - np.multiply(optiLambda,grad);
         fError = calc_error(points, fCoeffs);
@@ -173,7 +232,20 @@ def optimalLambda(points, iCoeffs, grad, lambdas):
         lambdas: list of potential lambda values
     '''
 
-    return lambdas[calc_error(points, [iCoeffs - np.multiply(lambdo,grad) for lambdo in lambdas]).argmin(axis=0)]
+    # return .0001
+
+    # return lambdas[calc_error(points, [iCoeffs - np.multiply(lambdo,grad) for lambdo in lambdas]).argmin(axis=0)]
+
+    new_coeffs = []
+
+    for lambdo in lambdas:
+        new_coeffs.append(iCoeffs - np.multiply(lambdo, grad))
+
+    potential_errors = [calc_error(points, new_coeff_set) for new_coeff_set in new_coeffs]
+
+    return lambdas[potential_errors.index(min(potential_errors))]
+
+
 
 
 def eval_func(points, optimVals):
@@ -206,10 +278,12 @@ def plot_results(points, optimVals):
 
 if __name__ == '__main__':
 
-    points = [(1, 1), (2, 5), (3, 2), (4, 10)]
+    points = [(1, 1), (2, 2), (3, 3), (4, 4), (5, 52)]
     # xp = [39,78,117,156,195,234,273,312,351,390,429,468,507,546,585,624,702]
     # yp = [42,99,124,207,304,372,440,632,842,1023,1205,1398,1783,2177,2565,3851,5962]
     # points = zip(xp, yp)
+
+    # points = [(i,i**2+random.randint(0,1000)) for i in range(-20,20)]
 
     results = pol_reg(points)
     print results
