@@ -30,10 +30,10 @@ def calc_all_error(points, coeffMatrices):
     Calculates total error over entire domain for each set
     of coefficient values
 
-	Inputs:
-		points (list of tuples): 'data set' of points to fit
-		coeffMatrices (list of np matrices): List of matrices
-		representing all possible combinations of coeff vals
+    Inputs:
+        points (list of tuples): 'data set' of points to fit
+        coeffMatrices (list of np matrices): List of matrices
+        representing all possible combinations of coeff vals
 
     Returns:
         errorMatrix (np matrix): Error at each given pointl
@@ -75,62 +75,62 @@ def indexByTuple(matrix, index):
 
 
 def calc_gradient(points, coeffVals, indexCoeff):
-	'''
-	Calculates derivative of function with respect to given
-	coefficient index at each given error function location
+    '''
+    Calculates derivative of function with respect to given
+    coefficient index at each given error function location
 
-	Inputs:
-		points (list of tuples): 'data set' of points to fit
-		coeffVals (list): Coefficients of polynomial function
-		indexCoeff (int): Term of function for which derivative
-		is taken respect to
-	Returns:
-		finalDeriv (int): Value of derivative of function with
-		respect to the given index
-	'''
-	for point in points:
-		xVal = point[0]
-		yVal = point[1]
-		xDepDeriv = sum([coeff*(xVal**(index+indexCoeff)) for index, coeff in enumerate(coeffVals)])
-		deriv = yVal*(xVal**(indexCoeff)) - xDepDeriv
+    Inputs:
+        points (list of tuples): 'data set' of points to fit
+        coeffVals (list): Coefficients of polynomial function
+        indexCoeff (int): Term of function for which derivative
+        is taken respect to
+    Returns:
+        finalDeriv (int): Value of derivative of function with
+        respect to the given index
+    '''
+    for point in points:
+        xVal = point[0]
+        yVal = point[1]
+        xDepDeriv = sum([coeff*(xVal**(index+indexCoeff)) for index, coeff in enumerate(coeffVals)])
+        deriv = yVal*(xVal**(indexCoeff)) - xDepDeriv
 
-	finalDeriv = -2*deriv
-	return finalDeriv
+    finalDeriv = -2*deriv
+    return finalDeriv
 
 def calc_all_gradient(points, coeffVals):
-	'''
-	Calculates gradient for every point in domain, where each
-	point includes a set of coefficient values describing the
-	function
+    '''
+    Calculates gradient for every point in domain, where each
+    point includes a set of coefficient values describing the
+    function
 
-	Inputs:
-		points (list of tuples): 'data set' of points to fit
-		coeffMatrices (list of np matrices): List of matrices
-		representing all possible combinations of coeff vals
+    Inputs:
+        points (list of tuples): 'data set' of points to fit
+        coeffMatrices (list of np matrices): List of matrices
+        representing all possible combinations of coeff vals
 
-	Returns:
-		errorMatrix (np matrix): Error at each given point
-	'''
-	# gradientMatrix = np.zeros([coeffMatrices[0].shape[i] for i in range(len(coeffMatrices.shape[0]))])
+    Returns:
+        errorMatrix (np matrix): Error at each given point
+    '''
+    # gradientMatrix = np.zeros([coeffMatrices[0].shape[i] for i in range(len(coeffMatrices.shape[0]))])
 
-	# ranges = [range(coeffMatrix.shape[i]) for i in range(len(coeffMatrix.shape)) for coeffMatrix in coeffMatrices]
+    # ranges = [range(coeffMatrix.shape[i]) for i in range(len(coeffMatrix.shape)) for coeffMatrix in coeffMatrices]
 
-	# domain = itertools.product(*ranges)
+    # domain = itertools.product(*ranges)
 
-	# for location in domain:
-	# 	coeffVals = [coeffMatrix[location] for coeffMatrix in coeffMatrices]
-	gradientAtLoc = []
+    # for location in domain:
+    #   coeffVals = [coeffMatrix[location] for coeffMatrix in coeffMatrices]
+    gradientAtLoc = []
 
-	for i in range(len(coeffVals)):
-		gradientAtLoc.append(calc_gradient(points, coeffVals, i))
+    for i in range(len(coeffVals)):
+        gradientAtLoc.append(calc_gradient(points, coeffVals, i))
 
-	# gradientMatrix[location] = gradientAtLoc
+    # gradientMatrix[location] = gradientAtLoc
 
-	return gradientAtLoc
+    return gradientAtLoc
 
 def pol_reg(points):
-    degree = 3
-    while degree<4:
+    degree = 2
+    while degree<3:
         # coeffMatrix = np.meshgrid(*[np.linspace(-100, 100, 2000) for i in range(degree)], sparse=True)
         optimCoeffs = gradientDescent(points, degree)
         degree += 1
@@ -154,7 +154,7 @@ def gradientDescent(points, degree):
     grad = np.ones(degree)
 
     # perform the gr dsc
-    while (np.linalg.norm(grad) > .00001):
+    while (np.linalg.norm(grad) > .001):
         it  = it + 1
         grad = calc_all_gradient(points, iCoeffs)
         optiLambda = optimalLambda(points, iCoeffs, grad, lambdas)
@@ -178,39 +178,44 @@ def optimalLambda(points, iCoeffs, grad, lambdas):
 
 def eval_func(points, optimVals):
 
-	min_x = min(points, key=lambda point:point[0])[0]
-	max_x = max(points, key=lambda point:point[0])[0]
+    min_x = min(points, key=lambda point:point[0])[0]
+    max_x = max(points, key=lambda point:point[0])[0]
 
-	domain = np.linspace(min_x, max_x, 100)
+    domain = np.linspace(min_x, max_x, 100)
 
-	func_res = []
+    func_res = []
 
-	for x in domain:
-		res = 0
-		for index, coeff in enumerate(optimVals[1]):
-			res += coeff*(x**index)
+    for x in domain:
+        res = 0
+        for index, coeff in enumerate(optimVals[1]):
+            res += coeff*(x**index)
 
-		func_res.append(res)
+        func_res.append(res)
 
-	return domain, func_res
+    return domain, func_res
 
 def plot_results(points, optimVals):
-	domain, function_res = eval_func(points, optimVals)
+    domain, function_res = eval_func(points, optimVals)
 
-	xs = [point[0] for point in points]
-	ys = [point[1] for point in points]
+    xs = [point[0] for point in points]
+    ys = [point[1] for point in points]
 
-	plt.scatter(xs, ys)
-	plt.plot(domain, function_res)
+    plt.scatter(xs, ys)
+    plt.plot(domain, function_res)
 
-	plt.show()
+    plt.show()
 
 
 if __name__ == '__main__':
-	points = [(1, 1), (1, 0), (2, 2), (12, 5432)]
 
-	results = pol_reg(points)
 
-	print results
+    points = [(i, i**2+i**3) for i in range(-30, 30)]
 
-	plot_results(points, results)
+
+    # points = [(1, 1), (1, 0), (2, 2), (12, 5432)]
+
+    results = pol_reg(points)
+
+    print results
+
+    plot_results(points, results)
