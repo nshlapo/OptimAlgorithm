@@ -145,11 +145,22 @@ def calc_gradient(points, coeffVals, indexCoeff):
         finalDeriv (int): Value of derivative of function with
         respect to the given index
     '''
+
+    # for point in points:
+    #     xVal = point[0]
+    #     yVal = point[1]
+    #     sum_coeffs = 0
+    #     for index, coeff in enumerate(coeffVals):
+
+    #     yVal*(xVal**indexCoeff) - sum_coeffs
+
+    deriv = 0
     for point in points:
         xVal = point[0]
         yVal = point[1]
         xDepDeriv = sum([coeff*(xVal**(index+indexCoeff)) for index, coeff in enumerate(coeffVals)])
-        deriv = yVal*(xVal**(indexCoeff)) - xDepDeriv
+        deriv += yVal*(xVal**(indexCoeff)) - xDepDeriv
+
 
     finalDeriv = -2*deriv
     return finalDeriv
@@ -183,7 +194,7 @@ def calc_all_gradient_test(points, coeffVals):
 
     all_gradients = np.multiply(-2,[aGrad, bGrad, cGrad])
 
-    print all_gradients
+    # print all_gradients
 
     return all_gradients
 
@@ -208,20 +219,25 @@ def gradientDescent(points, degree):
     # initialize variables and arrays we'll need for gr dsc
     iCoeffs = np.zeros(degree)
     iError = calc_error(points, iCoeffs)
-    lambdas = np.logspace(-8, 1, 50)
+    lambdas = np.logspace(-8, 2, 50)
     it = 0
     grad = np.ones(degree)
 
     # perform the gr dsc
-    while (np.linalg.norm(grad) > .001):
+    while (np.linalg.norm(grad) > 1):
+        plt.ion()
         it += 1
-        grad = calc_all_gradient_test(points, iCoeffs)
+        grad = calc_all_gradient(points, iCoeffs)
+        # grad1 = calc_all_gradient_test(points, iCoeffs)
+        if it%1000 is 0:
+            print grad
+            print np.linalg.norm(grad), iError
         optiLambda = optimalLambda(points, iCoeffs, grad, lambdas)
         fCoeffs = iCoeffs - np.multiply(optiLambda,grad);
         fError = calc_error(points, fCoeffs);
         iCoeffs = fCoeffs;
         iError = fError;
-
+        plot_results(points, (it, fCoeffs))
     return it, fCoeffs
 
 def optimalLambda(points, iCoeffs, grad, lambdas):
@@ -244,7 +260,7 @@ def optimalLambda(points, iCoeffs, grad, lambdas):
     potential_errors = [calc_error(points, new_coeff_set) for new_coeff_set in new_coeffs]
 
     return lambdas[potential_errors.index(min(potential_errors))]
-
+    # return .00001
 
 
 
@@ -270,24 +286,27 @@ def plot_results(points, optimVals):
     xs = [point[0] for point in points]
     ys = [point[1] for point in points]
 
+    plt.clf()
+    # plt.axis((0, 11, -10, 20))
     plt.scatter(xs, ys)
     plt.plot(domain, function_res)
+    plt.pause(0.0001)
 
     plt.show()
 
 
 if __name__ == '__main__':
 
-    points = [(1, 1), (2, 2), (3, 3), (4, 4), (5, 52)]
+    # points = [(1, 4), (2, 2), (3, 3), (4, 4), (5, 1), (2.2, 2.2), (3.5, 3.2), (10, -2)]
     # xp = [39,78,117,156,195,234,273,312,351,390,429,468,507,546,585,624,702]
     # yp = [42,99,124,207,304,372,440,632,842,1023,1205,1398,1783,2177,2565,3851,5962]
     # points = zip(xp, yp)
 
-    # points = [(i,i**2+random.randint(0,1000)) for i in range(-20,20)]
+    points = [(i,i**2+random.randint(0,100)) for i in range(-10,10)]
 
     results = pol_reg(points)
     print results
-
+    plt.ioff()
     plot_results(points, results)
 
     #TODO:
