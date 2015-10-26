@@ -195,15 +195,28 @@ def calc_all_gradient_test(points, coeffVals):
     all_gradients = np.multiply(-2,[aGrad, bGrad, cGrad])
 
     # print all_gradients
-
     return all_gradients
 
-def pol_reg(points):
-    degree = 3
-    while degree<4:
-        # coeffMatrix = np.meshgrid(*[np.linspace(-100, 100, 2000) for i in range(degree)], sparse=True)
+def pol_reg(points, TSS, sampleSize):
+    degree = 2
+    prevRbar2 = -1
+    while degree < 6:
         optimCoeffs = gradientDescent(points, degree)
+        RSS = calc_error(points, optimCoeffs[1])
+
+        R2 = 1 - (RSS/TSS)
+        Rbar2 = R2 - (1-R2)*degree/(sampleSize - degree - 2)
+        print "Degree: ", degree
+        print "R2: ", R2
+        print "Rbar2: ", Rbar2
+
+        if prevRbar2 > Rbar2:
+            print 'Break'
+            return prevOptimCoeffs
+
+        prevRbar2 = Rbar2
         degree += 1
+        prevOptimCoeffs = optimCoeffs
 
     return optimCoeffs
 
@@ -219,25 +232,27 @@ def gradientDescent(points, degree):
     # initialize variables and arrays we'll need for gr dsc
     iCoeffs = np.zeros(degree)
     iError = calc_error(points, iCoeffs)
-    lambdas = np.logspace(-8, 2, 50)
+    lambdas = np.logspace(-10, 2, 100)
     it = 0
-    grad = np.ones(degree)
+    grad = 100*np.ones(degree)
 
     # perform the gr dsc
-    while (np.linalg.norm(grad) > 1):
+    while (np.linalg.norm(grad) > (10**(degree - 2))):
         plt.ion()
         it += 1
         grad = calc_all_gradient(points, iCoeffs)
         # grad1 = calc_all_gradient_test(points, iCoeffs)
-        if it%1000 is 0:
-            print grad
-            print np.linalg.norm(grad), iError
+        if it%500 is 0:
+            print "Gradient: ", np.linalg.norm(grad)
+            print "Error: ", iError
+            plot_results(points, (it, fCoeffs))
+
         optiLambda = optimalLambda(points, iCoeffs, grad, lambdas)
         fCoeffs = iCoeffs - np.multiply(optiLambda,grad);
         fError = calc_error(points, fCoeffs);
         iCoeffs = fCoeffs;
         iError = fError;
-        plot_results(points, (it, fCoeffs))
+
     return it, fCoeffs
 
 def optimalLambda(points, iCoeffs, grad, lambdas):
@@ -303,13 +318,14 @@ if __name__ == '__main__':
     # points = zip(xp, yp)
 
     points = [(i,i**2+random.randint(0,100)) for i in range(-10,10)]
+    yp = [point[1] for point in points]
+    yAvg = sum(yp)/len(yp)
 
-    results = pol_reg(points)
-    print results
+    sampleSize = len(yp)
+    TSS = sum([(y-yAvg)**2 for y in yp])
+
+    results = pol_reg(points, TSS, sampleSize)
+    print "Iterations, Coeff: ", results
+
     plt.ioff()
     plot_results(points, results)
-
-    #TODO:
-    # Test w/ diff starting points
-    # Plot func surface and gradient vector field
-    # plot gradient descent
