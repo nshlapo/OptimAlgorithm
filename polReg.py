@@ -1,10 +1,10 @@
+# Created by Patrick Huston and Nur Shlapobersky on 10/10/15
+
 from __future__ import division
 import numpy as np
 import itertools
 import matplotlib.pyplot as plt
 import random
-
-
 
 def calc_error(points, coeffVals):
     '''
@@ -96,6 +96,7 @@ def calc_gradient(points, coeffVals, indexCoeff):
         deriv = yVal*(xVal**(indexCoeff)) - xDepDeriv
 
     finalDeriv = -2*deriv
+
     return finalDeriv
 
 
@@ -122,31 +123,6 @@ def calc_all_gradient(points, coeffVals):
     return gradientAtLoc
 
 
-def calc_gradient(points, coeffVals, indexCoeff):
-    '''
-    Calculates derivative of function with respect to given
-    coefficient index at each given error function location
-
-    Inputs:
-        points (list of tuples): 'data set' of points to fit
-        coeffVals (list): Coefficients of polynomial function
-        indexCoeff (int): Term of function for which derivative
-        is taken respect to
-    Returns:
-        finalDeriv (int): Value of derivative of function with
-        respect to the given index
-    '''
-    deriv = 0
-    for point in points:
-        xVal = point[0]
-        yVal = point[1]
-        xDepDeriv = sum([coeff*(xVal**(index+indexCoeff)) for index, coeff in enumerate(coeffVals)])
-        deriv += yVal*(xVal**(indexCoeff)) - xDepDeriv
-
-    finalDeriv = -2*deriv
-    return finalDeriv
-
-
 def gradientDescent(points, degree):
     ''' 
     Performs a gradient descent using coeffs as the domain and returns the
@@ -156,6 +132,10 @@ def gradientDescent(points, degree):
     Inputs:
         points (list of tuples): points in input data set
         degree (int): the length of the coefficient arrays in coeffs
+
+    Returns:
+        it (int): Number of iterations calculation took
+        fCoeffs (list): fitted coefficients
     '''
 
     # initialize variables and arrays we'll need for gr dsc
