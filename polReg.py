@@ -242,7 +242,7 @@ def gradientDescent(points, degree):
         it += 1
         grad = calc_all_gradient(points, iCoeffs)
         # grad1 = calc_all_gradient_test(points, iCoeffs)
-        if it%500 is 0:
+        if it%200 is 0:
             print "Gradient: ", np.linalg.norm(grad)
             print "Error: ", iError
             plot_results(points, (it, fCoeffs))
@@ -317,7 +317,7 @@ if __name__ == '__main__':
     # yp = [42,99,124,207,304,372,440,632,842,1023,1205,1398,1783,2177,2565,3851,5962]
     # points = zip(xp, yp)
 
-    points = [(i,i**2+random.randint(0,100)) for i in range(-10,10)]
+    points = [(i,(i**3 - i**2 + i**4) + random.randint(0,100)) for i in range(-10,10)]
     yp = [point[1] for point in points]
     yAvg = sum(yp)/len(yp)
 
